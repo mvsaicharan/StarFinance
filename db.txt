@@ -1,0 +1,138 @@
+-- 1. Create the database
+CREATE DATABASE IF NOT EXISTS star_finance_db;
+
+-- Use the newly created database
+USE star_finance_db;
+
+---
+
+-- 2. Create the customer table
+CREATE TABLE customer (
+    id                  BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name                VARCHAR(255) NOT NULL,
+    email               VARCHAR(255) NOT NULL UNIQUE,
+    kn_number           VARCHAR(255) UNIQUE,
+    aadhaar             VARCHAR(12) UNIQUE,
+    pan_card            VARCHAR(10) UNIQUE,
+    kyc_status          TINYINT(1) NOT NULL DEFAULT 0,
+    password            VARCHAR(255),
+    oauth_provider      VARCHAR(255),
+    oauth_id            VARCHAR(255) UNIQUE,
+    kyc_verified        TINYINT(1) DEFAULT 0,
+    bank_account_number VARCHAR(20),
+    city                VARCHAR(100),
+    date_of_birth       VARCHAR(255),
+    existing_loans      VARCHAR(50),
+    full_address        VARCHAR(500),
+    gender              VARCHAR(10),
+    ifsc_code           VARCHAR(11),
+    income              VARCHAR(50),
+    mobile_number       VARCHAR(10),
+    occupation          VARCHAR(100),
+    passport_number     VARCHAR(8),
+    pin_code            VARCHAR(6),
+    state               VARCHAR(100)
+);
+
+---
+
+-- 3. Create the employee table
+CREATE TABLE employee (
+    id          BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    username    VARCHAR(255) NOT NULL UNIQUE,
+    password    VARCHAR(255) NOT NULL,
+    full_name   VARCHAR(255) NOT NULL,
+    role        ENUM('BANK_ADMIN','BANK_STAFF') NOT NULL DEFAULT 'BANK_STAFF',
+    branch_name VARCHAR(255) NOT NULL
+);
+
+---
+
+-- 4. Create the gold_rates table
+CREATE TABLE gold_rates (
+    id              INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    karat_label     VARCHAR(255) NOT NULL UNIQUE,
+    rate_per_gram   DECIMAL(38,2) NOT NULL
+);
+
+---
+
+-- 5. Create the kyc_reference table
+CREATE TABLE kyc_reference (
+    id              BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    aadhaar_number  VARCHAR(12) NOT NULL UNIQUE,
+    pan_number      VARCHAR(10) NOT NULL UNIQUE,
+    full_name       VARCHAR(100) NOT NULL,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+---
+
+-- 6. Create the bankaccount table
+CREATE TABLE bankaccount (
+    id                  BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    account_holder_name VARCHAR(255) NOT NULL,
+    joint_account       TINYINT(1) DEFAULT 0,
+    account_type        ENUM('Savings','Current') NOT NULL,
+    account_number      VARCHAR(255) NOT NULL UNIQUE,
+    ifsc_code           VARCHAR(255) NOT NULL,
+    bank_name           VARCHAR(255) NOT NULL,
+    branch_name         VARCHAR(255) NOT NULL,
+    customer_id         BIGINT NOT NULL,
+    FOREIGN KEY (customer_id) REFERENCES customer(id) -- Foreign Key
+);
+
+---
+
+-- 7. Create the asset table
+CREATE TABLE asset (
+    id              BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    type            VARCHAR(255) NOT NULL,
+    weight          DECIMAL(38,2) NOT NULL,
+    purchase_place  VARCHAR(255),
+    jeweler_name    VARCHAR(255),
+    photo_url       VARCHAR(255),
+    customer_id     BIGINT NOT NULL,
+    quality_index   DOUBLE,
+    FOREIGN KEY (customer_id) REFERENCES customer(id) -- Foreign Key
+);
+
+---
+
+-- 8. Create the loanapplication table
+CREATE TABLE loanapplication (
+    id                  BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    rid                 VARCHAR(255) NOT NULL UNIQUE,
+    status              VARCHAR(50) NOT NULL DEFAULT 'PENDING',
+    amount              DECIMAL(38,2),
+    customer_id         BIGINT NOT NULL,
+    asset_id            BIGINT NOT NULL,
+    bank_account_id     BIGINT,
+    created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    final_value         DECIMAL(38,2),
+    rejection_reason    VARCHAR(500),
+    FOREIGN KEY (customer_id) REFERENCES customer(id), -- Foreign Key
+    FOREIGN KEY (asset_id) REFERENCES asset(id),       -- Foreign Key
+    FOREIGN KEY (bank_account_id) REFERENCES bankaccount(id) -- Foreign Key
+);
+
+
+
+
+INSERT INTO gold_rates (id, karat_label, rate_per_gram) VALUES
+(1, '24 Karat', 8000.00),
+(2, '22 Karat', 6600.00),
+(3, '18 Karat', 5400.00),
+(4, '14 Karat', 4200.00);
+
+
+INSERT INTO kyc_reference (aadhaar_number, pan_number, full_name) VALUES
+('123456789012', 'ABCDE1234A', 'Ravi Kumar Sharma'),
+('234567890123', 'FGHIJ5678B', 'Priya Singh Varma'),
+('345678901234', 'KLMNO9012C', 'Amitesh Dasgupta'),
+('456789012345', 'PQRST3456D', 'Sanjana Reddy'),
+('567890123456', 'UVWXY7890E', 'Mohammad Zafar');
+
+
+INSERT INTO employee (id, username, password, full_name, role, branch_name)
+VALUES (1, 'admin@gmail.com', '$2a$10$FQ9mWO2YCnhhPdtHFHQX..zWvks3cAln4lQ33DMOEdevxB16S8ydO', 'Admin User', 'BANK_ADMIN', 'Head Office');
