@@ -1,0 +1,171 @@
+<div class="py-12 px-6 min-h-screen bg-gray-50">
+  <div class="max-w-4xl mx-auto bg-white p-8 sm:p-10 rounded-2xl shadow-lg border border-gray-100">
+
+    <!-- Header Section -->
+    <div class="text-center mb-8">
+      <div class="inline-block bg-indigo-100 p-4 rounded-full mb-4">
+        <svg class="w-10 h-10 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+          stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
+        </svg>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-800">Create New Employee</h1>
+      <p class="text-gray-500 mt-2">Generate secure credentials and assign team roles within the branch network.</p>
+    </div>
+
+
+
+    <!-- Form -->
+    <form [formGroup]="createEmployeeForm" (ngSubmit)="onSubmit()">
+
+      <!-- Personal Information Section -->
+      <fieldset class="mb-10">
+        <legend class="text-xl font-bold text-gray-700 mb-6 border-b pb-2 w-full">1. Personal Information</legend>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="md:col-span-2">
+            <label for="fullName" class="block text-gray-600 mb-2 font-semibold">Employee Full Name</label>
+            <input formControlName="fullName" placeholder="e.g., Jennifer Lee" type="text" id="fullName"
+              class="input-field"
+              [class.border-red-300]="createEmployeeForm.get('fullName')?.invalid && createEmployeeForm.get('fullName')?.touched">
+            @if (createEmployeeForm.get('fullName')?.hasError('required') &&
+            createEmployeeForm.get('fullName')?.touched) {
+            <div class="text-red-500 text-sm mt-1">
+              Full Name is required.
+            </div>
+            }
+          </div>
+
+          <div>
+            <label for="username" class="block text-gray-600 mb-2 font-semibold">Email / Username</label>
+            <input formControlName="username" placeholder="e.g., jlee@starfinance.com" type="text" id="username"
+              class="input-field"
+              [class.border-red-300]="createEmployeeForm.get('username')?.invalid && createEmployeeForm.get('username')?.touched">
+            @if (createEmployeeForm.get('username')?.hasError('required') &&
+            createEmployeeForm.get('username')?.touched) {
+            <div class="text-red-500 text-sm mt-1">
+              Username is required.
+            </div>
+            }
+            @if (createEmployeeForm.get('username')?.hasError('minlength') &&
+            createEmployeeForm.get('username')?.touched) {
+            <div class="text-red-500 text-sm mt-1">
+              Username must be at least 4 characters.
+            </div>
+            }
+          </div>
+
+          <div>
+            <label for="password" class="block text-gray-600 mb-2 font-semibold">Initial Password</label>
+            <input formControlName="password" placeholder="Min. 8 characters" type="password" id="password"
+              class="input-field"
+              [class.border-red-300]="createEmployeeForm.get('password')?.invalid && createEmployeeForm.get('password')?.touched">
+            <div class="text-gray-500 text-sm mt-1">Employee must change this upon first login.</div>
+            @if (createEmployeeForm.get('password')?.hasError('required') &&
+            createEmployeeForm.get('password')?.touched) {
+            <div class="text-red-500 text-sm mt-1">
+              Password is required.
+            </div>
+            }
+            @if (createEmployeeForm.get('password')?.hasError('minlength') &&
+            createEmployeeForm.get('password')?.touched) {
+            <div class="text-red-500 text-sm mt-1">
+              Password must be at least 8 characters.
+            </div>
+            }
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- Role Assignment Section -->
+      <fieldset class="mb-10">
+        <legend class="text-xl font-bold text-gray-700 mb-6 border-b pb-2 w-full">2. Role Assignment</legend>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="role" class="block text-gray-600 mb-2 font-semibold">Assign Role</label>
+            <select formControlName="role" id="role" class="input-field"
+              [class.border-red-300]="createEmployeeForm.get('role')?.invalid && createEmployeeForm.get('role')?.touched">
+              <option value="" disabled>Select Employee Role</option>
+              @for (role of employeeRoles; track role) {
+              <option [value]="role">
+                {{ role === 'BANK_ADMIN' ? 'Bank Administrator' : 'Bank Staff' }}
+              </option>
+              }
+            </select>
+            @if (createEmployeeForm.get('role')?.hasError('required') && createEmployeeForm.get('role')?.touched) {
+            <div class="text-red-500 text-sm mt-1">
+              Role is required.
+            </div>
+            }
+            @if (createEmployeeForm.get('role')?.value === 'BANK_ADMIN') {
+            <div class="text-indigo-600 text-sm mt-1">
+              Grants full system management privileges.
+            </div>
+            }
+          </div>
+
+          <div>
+            <label for="branchName" class="block text-gray-600 mb-2 font-semibold">Assign Branch</label>
+            <select formControlName="branchName" id="branchName" class="input-field"
+              [class.border-red-300]="createEmployeeForm.get('branchName')?.invalid && createEmployeeForm.get('branchName')?.touched">
+              <option value="" disabled>Select Branch Location</option>
+              @for (branch of branchNames; track branch) {
+              <option [value]="branch">
+                {{ branch }}
+              </option>
+              }
+            </select>
+            @if (createEmployeeForm.get('branchName')?.hasError('required') &&
+            createEmployeeForm.get('branchName')?.touched) {
+            <div class="text-red-500 text-sm mt-1">
+              Branch Name is required.
+            </div>
+            }
+          </div>
+
+          <!-- Role Permissions Info -->
+          <div class="md:col-span-2 p-4 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 text-sm">
+            <p class="font-bold mb-1">Role Permissions:</p>
+            @if (createEmployeeForm.get('role')?.value === 'BANK_ADMIN') {
+            <p>Admin can create new employees, manage users, and process all loan steps.</p>
+            } @else if (createEmployeeForm.get('role')?.value === 'BANK_STAFF') {
+            <p>Staff can verify KYC, evaluate gold, and process routine loan steps (excluding employee creation).</p>
+            } @else {
+            <p>Select a role to view assigned privileges.</p>
+            }
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- Submit Button -->
+      <div class="mt-10 flex justify-center">
+        <button type="submit" [disabled]="createEmployeeForm.invalid || isLoading"
+          class="submit-button w-full sm:w-auto min-w-[200px]"
+          [class.opacity-50]="createEmployeeForm.invalid || isLoading">
+
+          @if (!isLoading) {
+          <span class="flex items-center justify-center">
+            <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
+            </svg>
+            Create Employee
+          </span>
+          } @else {
+          <span class="flex items-center justify-center">
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+              </path>
+            </svg>
+            Creating Account...
+          </span>
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

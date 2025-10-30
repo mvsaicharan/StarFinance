@@ -1,0 +1,70 @@
+<div class="min-h-screen bg-gradient-to-r from-indigo-200 via-blue-200 to-yellow-200 p-8">
+  <div class="max-w-7xl mx-auto">
+    
+    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 border-b pb-4 border-gray-200">
+      <div class="flex flex-col">
+        <h1 class="text-3xl font-extrabold text-indigo-700">Employee Dashboard</h1>
+        <p class="text-gray-500 mt-1">Manage loan requests and workflow below.</p>
+      </div>
+
+      <div class="mt-4 sm:mt-0 text-left sm:text-right">
+        <p class="text-sm text-gray-500">Welcome back,</p>
+        <h2 class="text-2xl font-bold text-gray-800">{{ userName() }}</h2>
+      </div>
+    </header>
+
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+      <div *ngFor="let card of statCards()" 
+           class="bg-white p-6 rounded-xl shadow-md border"
+           [ngClass]="card.active ? 'border-indigo-500' : 'border-transparent'">
+        <p class="text-5xl font-bold text-gray-800">{{ card.count }}</p>
+        <p class="text-gray-500 font-semibold">{{ card.title }}</p>
+      </div>
+    </section>
+
+    <section class="bg-white p-6 rounded-2xl shadow-md">
+      <h2 class="text-xl font-bold text-gray-800 mb-4">Loan Requests</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left">
+          <thead>
+            <tr class="text-xs text-gray-500 uppercase border-b bg-gray-50">
+              <th class="py-3 px-4">Request ID</th>
+              <th class="py-3 px-4">KN</th>
+              <th class="py-3 px-4">Name</th>
+              <th class="py-3 px-4">Status</th>
+              <th class="py-3 px-4"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let loan of sortedLoans()" class="border-b last:border-none hover:bg-gray-50">
+              <td class="py-4 px-4 font-mono text-xs text-gray-600">{{ loan.id }}</td>
+              <td class="py-4 px-4 font-mono text-xs text-gray-600">{{ loan.kn }}</td>
+              <td class="py-4 px-4">
+                <p class="font-semibold text-gray-700">{{ loan.name }}</p>
+                <p class="text-xs text-gray-500">{{ loan.date }}</p>
+              </td>
+              <td class="py-4 px-4">
+                  <span *ngIf="loan.status.toUpperCase() !== 'VERIFIED'" 
+                        class="px-3 py-1 text-xs font-semibold rounded-full" 
+                        [ngClass]="{
+                          'bg-green-100 text-green-800': loan.status.toUpperCase() === 'OFFER ACCEPTED' || loan.status.toUpperCase() === 'DISBURSED' || loan.status.toUpperCase() === 'ACCEPTED' || loan.status.toUpperCase() === 'GOLD_SUBMITTED',
+                          
+                          'bg-yellow-100 text-yellow-800': loan.status.toUpperCase() === 'PENDING' || loan.status.toUpperCase() === 'EVALUATED' || loan.status.toUpperCase() === 'OFFER MADE',
+                          
+                          'bg-red-100 text-red-800': loan.status.toUpperCase() === 'REJECTED' || loan.status.toUpperCase() === 'REJECTED_FOR_REVIEW' || loan.status.toUpperCase() === 'OFFER REJECTED'
+                        }">
+                      {{ loan.status }}
+                  </span>
+              </td>
+              <td class="py-4 px-4 text-right">
+                <a [routerLink]="['/employee/loan-details', loan.id]" class="font-semibold text-indigo-600 hover:underline">
+                  View Details
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</div>

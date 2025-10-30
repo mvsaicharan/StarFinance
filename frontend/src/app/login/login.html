@@ -1,0 +1,109 @@
+<div class="flex flex-col md:flex-row min-h-screen font-sans">
+  <div class="w-full md:w-3/5 bg-gradient-to-r from-indigo-300 via-blue-300 to-yellow-300 flex flex-col justify-center items-center p-8 md:p-12 text-white">
+    <div class="max-w-sm text-center">
+      <img src="assets/images/login.png" alt="Star Finance Logo" class="w-28 h-28 mx-auto mb-6">
+      <h1 class="text-4xl font-bold mb-2">Star Finance</h1>
+      <p class="text-lg text-black">Quick, Secure, and Trusted Gold & Silver Loans.</p>
+    </div>
+  </div>
+
+  <div class="w-full md:w-2/5 flex items-center justify-center bg-gray-50 p-8">
+    <div class="max-w-md w-full">
+      <div class="bg-white p-8 rounded-2xl shadow-2xl">
+        
+        <ng-container *ngIf="!resetPasswordMode; else resetForm">
+          <h2 class="text-3xl font-bold text-gray-800 mb-2">Welcome Back!</h2>
+          <p class="text-gray-500 mb-8">Please select your role and sign in to continue.</p>
+
+          <div class="flex bg-gray-100 rounded-lg p-1 mb-6">
+            <button (click)="setActiveTab('customer')" [ngClass]="activeTab === 'customer' ? 'bg-indigo-600 text-white' : 'text-gray-500'" class="flex-1 py-2 rounded-lg font-semibold transition-colors duration-300 ease-in-out">Customer</button>
+            <button (click)="setActiveTab('employee')" [ngClass]="activeTab === 'employee' ? 'bg-indigo-600 text-white' : 'text-gray-500'" class="flex-1 py-2 rounded-lg font-semibold transition-colors duration-300 ease-in-out">Employee</button>
+          </div>
+
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+            <p *ngIf="activeTab === 'employee'" class="text-center text-sm text-gray-500 mb-4">Use the credentials given by the IT Admin.</p>
+
+            <div class="mb-4">
+              <label for="email" class="block text-gray-600 mb-2">Email Address</label>
+              <input formControlName="email" type="email" id="email" placeholder="you@example.com" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+            </div>
+            
+            <div class="mb-2">
+              <label for="password" class="block text-gray-600 mb-2">Password</label>
+              <div class="relative">
+                <input 
+                  formControlName="password"
+                  [type]="passwordVisible ? 'text' : 'password'" 
+                  id="password" 
+                  placeholder="••••••••" 
+                  class="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+                
+                <button type="button" (click)="togglePasswordVisibility()" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                  <svg *ngIf="!passwordVisible" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+                  <svg *ngIf="passwordVisible" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.575M2.25 2.25l19.5 19.5" /></svg>
+                </button>
+              </div>
+            </div>
+            
+            <div class="flex justify-end mb-6">
+              <a (click)="toggleResetPasswordMode(true)" class="text-sm text-indigo-600 hover:underline cursor-pointer">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-transform transform hover:scale-105">Sign In</button>
+          </form>
+
+          <div *ngIf="activeTab === 'customer'">
+            <div class="flex items-center my-6"><div class="flex-grow border-t border-gray-300"></div><span class="mx-4 text-gray-500 text-sm">or continue with</span><div class="flex-grow border-t border-gray-300"></div></div>
+            <div class="flex justify-center space-x-4">
+              <button  (click)="initiateGoogleOAuthLogin()" class="w-12 h-12 flex items-center justify-center border-2 border-gray-300 rounded-full hover:bg-gray-100 transition-colors"><svg class="w-6 h-6" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571l6.19,5.238C44.438,36.338,48,30.656,48,24C48,22.659,47.862,21.35,47.611,20.083z"></path></svg></button>
+              <button  (click)="initiateFacebookOAuthLogin()" class="w-12 h-12 flex items-center justify-center border-2 border-gray-300 rounded-full hover:bg-gray-100 transition-colors"><svg class="w-6 h-6 text-[#1877F2]" fill="currentColor" viewBox="0 0 24 24"><path d="M22,12c0-5.523-4.477-10-10-10S2,6.477,2,12c0,4.99,3.657,9.128,8.438,9.878V14.89h-2.54V12h2.54V9.797c0-2.506,1.492-3.89,3.777-3.89c1.094,0,2.238.195,2.238.195v2.46h-1.26c-1.24,0-1.628.772-1.628,1.562V12h2.773l-.443,2.89h-2.33V21.878C18.343,21.128,22,16.99,22,12z"></path></svg></button>
+            </div>
+          </div>
+          <p *ngIf="activeTab === 'customer'" class="text-center text-gray-500 mt-6">Don't have an account? <a routerLink="/signup" class="text-indigo-600 font-semibold hover:underline">Create Account</a></p>
+        </ng-container>
+
+        <ng-template #resetForm>
+          <h2 class="text-3xl font-bold text-gray-800 mb-2">Reset Password</h2>
+          <p class="text-gray-500 mb-6">Enter your details to verify your identity and set a new password for the <strong>{{ activeTab }}</strong> account.</p>
+
+          <div class="flex bg-gray-100 rounded-lg p-1 mb-6">
+            <button (click)="setActiveTab('customer')" [ngClass]="activeTab === 'customer' ? 'bg-indigo-600 text-white' : 'text-gray-500'" class="flex-1 py-2 rounded-lg font-semibold transition-colors duration-300 ease-in-out">Customer</button>
+            <button (click)="setActiveTab('employee')" [ngClass]="activeTab === 'employee' ? 'bg-indigo-600 text-white' : 'text-gray-500'" class="flex-1 py-2 rounded-lg font-semibold transition-colors duration-300 ease-in-out">Employee</button>
+          </div>
+          
+          <p *ngIf="successMessage" class="mb-4 p-3 bg-green-100 text-green-700 border-l-4 border-green-500 rounded-lg">{{ successMessage }}</p>
+          <p *ngIf="errorMessage" class="mb-4 p-3 bg-red-100 text-red-700 border-l-4 border-red-500 rounded-lg">{{ errorMessage }}</p>
+
+
+          <form [formGroup]="resetFormGroup" (ngSubmit)="onResetPassword()">
+            <div class="mb-4">
+              <label for="reset-email" class="block text-gray-600 mb-2">Email Address</label>
+              <input formControlName="email" type="email" id="reset-email" placeholder="you@example.com" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+            </div>
+
+            <div class="mb-4" *ngIf="activeTab === 'customer'">
+              <label for="reset-dob" class="block text-gray-600 mb-2">Date of Birth</label>
+              <input formControlName="dateOfBirth" type="date" id="reset-dob" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+            </div>
+
+            <div class="mb-4">
+              <label for="new-password" class="block text-gray-600 mb-2">New Password</label>
+              <input formControlName="newPassword" type="password" id="new-password" placeholder="New Password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+            </div>
+            
+            <div class="mb-6">
+              <label for="confirm-password" class="block text-gray-600 mb-2">Confirm New Password</label>
+              <input formControlName="confirmPassword" type="password" id="confirm-password" placeholder="Confirm New Password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+            </div>
+
+            <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-transform transform hover:scale-105">Reset Password</button>
+          </form>
+
+          <div class="text-center mt-6">
+            <a (click)="toggleResetPasswordMode(false)" class="text-sm text-indigo-600 hover:underline cursor-pointer">Back to Sign In</a>
+          </div>
+        </ng-template>
+        </div>
+    </div>
+  </div>
+</div>

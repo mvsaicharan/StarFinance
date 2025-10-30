@@ -1,0 +1,86 @@
+<div class="flex flex-col md:flex-row min-h-screen font-sans">
+  <div class="w-full md:w-3/5 bg-gradient-to-br from-indigo-600 to-purple-700 flex flex-col justify-center items-center p-8 md:p-12 text-white">
+    <div class="max-w-sm text-center">
+      <img src="/assets/images/login.png" alt="Star Finance Logo" class="w-28 h-28 mx-auto mb-6">
+      <h1 class="text-4xl font-bold mb-2">Star Finance</h1>
+      <p class="text-lg text-indigo-200">Quick, Secure, and Trusted Gold & Silver Loans.</p>
+    </div>
+  </div>
+
+  <div class="w-full md:w-2/5 flex items-center justify-center bg-gray-50 p-8">
+    <div class="max-w-md w-full">
+      <div class="bg-white p-8 rounded-2xl shadow-lg">
+        
+        <div *ngIf="!successMessage">
+          <h2 class="text-3xl font-bold text-gray-800 mb-2">Create Your Account</h2>
+          <p class="text-gray-500 mb-8">Join us to get your loan quickly and securely.</p>
+
+          <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+            <div class="space-y-4">
+              <div>
+                <label for="fullName" class="block text-gray-600 mb-2 font-semibold">Full Name</label>
+                <input formControlName="fullName" type="text" id="fullName" placeholder="John Doe" class="input-field">
+              </div>
+              <div>
+                <label for="email" class="block text-gray-600 mb-2 font-semibold">Email Address</label>
+                <input formControlName="email" type="email" id="email" placeholder="you@example.com" class="input-field">
+              </div>
+              <div>
+                <label for="password" class="block text-gray-600 mb-2 font-semibold">Password</label>
+                <div class="relative">
+                  <input formControlName="password" (focus)="passwordFocused = true" [type]="passwordVisible ? 'text' : 'password'" id="password" placeholder="••••••••" class="input-field pr-10">
+                  <button type="button" (click)="togglePasswordVisibility()" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                    <svg *ngIf="!passwordVisible" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+                    <svg *ngIf="passwordVisible" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.575M2.25 2.25l19.5 19.5" /></svg>
+                  </button>
+                </div>
+              </div>
+
+              <div *ngIf="passwordFocused" class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                <p [ngClass]="passwordValidation.minLength ? 'text-green-600' : 'text-red-600'">At least 8 characters</p>
+                <p [ngClass]="passwordValidation.hasUpperCase ? 'text-green-600' : 'text-red-600'">One uppercase letter</p>
+                <p [ngClass]="passwordValidation.hasLowerCase ? 'text-green-600' : 'text-red-600'">One lowercase letter</p>
+                <p [ngClass]="passwordValidation.hasNumber ? 'text-green-600' : 'text-red-600'">One number</p>
+                <p [ngClass]="passwordValidation.hasSpecialChar ? 'text-green-600' : 'text-red-600'">One special character</p>
+              </div>
+
+              <div>
+                <label for="confirmPassword" class="block text-gray-600 mb-2 font-semibold">Confirm Password</label>
+                <div class="relative">
+                  <input formControlName="confirmPassword" [type]="confirmPasswordVisible ? 'text' : 'password'" id="confirmPassword" placeholder="••••••••" class="input-field pr-10">
+                  <button type="button" (click)="toggleConfirmPasswordVisibility()" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                    <svg *ngIf="!confirmPasswordVisible" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+                  </button>
+                </div>
+                
+                <div *ngIf="f['confirmPassword'].errors?.['passwordMismatch'] && (f['confirmPassword'].dirty || f['confirmPassword'].touched)" class="text-red-600 text-sm mt-1">
+                  Passwords do not match.
+                </div>
+                </div>
+            </div>
+            <div class="mt-8">
+              <button type="submit" [disabled]="!signupForm.valid" class="submit-button">
+                Create Account
+              </button>
+            </div>
+          </form>
+          <p class="text-center text-gray-500 mt-6">
+            Already have an account?
+            <a routerLink="/login" class="text-indigo-600 font-semibold hover:underline">
+              Sign In
+            </a>
+          </p>
+        </div>
+        
+        <div *ngIf="successMessage" class="text-center p-4">
+          <div class="inline-block bg-green-100 p-4 rounded-full">
+            <svg class="w-10 h-10 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-800 mt-4">Success!</h2>
+          <p class="text-gray-600 mt-2">{{ successMessage }}</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

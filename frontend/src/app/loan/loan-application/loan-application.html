@@ -1,0 +1,159 @@
+
+<div class="py-12 px-6">
+  <div class="max-w-3xl mx-auto bg-white p-8 sm:p-10 rounded-2xl shadow-lg border border-gray-100">
+    <div class="text-center mb-10">
+      <h1 class="text-3xl font-bold text-gray-800">Gold Loan Application</h1>
+      <p class="text-gray-500 mt-2">Please provide the details of the gold you wish to pledge.</p>
+    </div>
+    
+    <div *ngIf="kycVerified === false" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-10" role="alert">
+      <p class="font-bold">KYC Verification Required</p>
+      <p>Your KYC is not verified. You cannot submit a loan application.</p>
+    </div>
+
+    <form [formGroup]="loanForm" (ngSubmit)="onSubmit()">
+      
+      <fieldset class="mb-10">
+        <legend class="text-xl font-bold text-gray-700 mb-6 border-b pb-2 w-full">Applicant Details (Read-only)</legend>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+          <div class="md:col-span-2">
+            <label for="fullName" class="block text-gray-600 mb-2 font-semibold">Full Name</label>
+            <input formControlName="fullName" type="text" id="fullName" class="input-field bg-gray-100 cursor-not-allowed" placeholder="Enter your full name" [readonly]="true">
+            <div *ngIf="f['fullName'].invalid && (f['fullName'].dirty || f['fullName'].touched)" class="text-red-600 text-sm mt-1">Full Name is required.</div>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2 mb-2">
+              <label for="knNumber" class="block text-gray-600 font-semibold">KN Number</label>
+              <div class="relative flex group">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-gray-400 cursor-pointer">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0ZM8.94 6.94a.75.75 0 1 1-1.06-1.061 3.5 3.5 0 0 1 4.242 0 .75.75 0 1 1-1.06 1.061A2 2 0 0 0 10 7.5a2 2 0 0 0-1.06.37Z M10 18a.75.75 0 0 0 .75-.75V11.5a.75.75 0 0 0-1.5 0v5.75A.75.75 0 0 0 10 18Z" clip-rule="evenodd" />
+                </svg>
+                <div class="absolute bottom-full -left-1/2 mb-2 w-48 p-2 text-xs text-white bg-gray-800 rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                  First, verify your KYC to get a KN Number.
+                </div>
+              </div>
+            </div>
+            <input formControlName="knNumber" type="text" id="knNumber" class="input-field bg-gray-100 cursor-not-allowed" placeholder="Enter your KN Number" [readonly]="true">
+            <div *ngIf="f['knNumber'].invalid && (f['knNumber'].dirty || f['knNumber'].touched)" class="text-red-600 text-sm mt-1">KN Number is required.</div>
+          </div>
+          <div>
+            <label for="gender" class="block text-gray-600 mb-2 font-semibold">Gender</label>
+            <select formControlName="gender" id="gender" class="input-field bg-gray-100 cursor-not-allowed" [attr.disabled]="true">
+              <option value="" disabled>Select Gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+            <div *ngIf="f['gender'].invalid && (f['gender'].dirty || f['gender'].touched)" class="text-red-600 text-sm mt-1">Gender is required.</div>
+          </div>
+          <div>
+            <label for="mobileNumber" class="block text-gray-600 mb-2 font-semibold">Mobile Number</label>
+            <input formControlName="mobileNumber" type="text" id="mobileNumber" class="input-field bg-gray-100 cursor-not-allowed" placeholder="Enter 10-digit mobile number" [readonly]="true">
+            <div *ngIf="f['mobileNumber'].invalid && (f['mobileNumber'].dirty || f['mobileNumber'].touched)" class="text-red-600 text-sm mt-1">A valid 10-digit mobile number is required.</div>
+          </div>
+          <div>
+            <label for="emailId" class="block text-gray-600 mb-2 font-semibold">Email ID</label>
+            <input formControlName="emailId" type="email" id="emailId" class="input-field bg-gray-100 cursor-not-allowed" placeholder="you@example.com" [readonly]="true">
+            <div *ngIf="f['emailId'].invalid && (f['emailId'].dirty || f['emailId'].touched)" class="text-red-600 text-sm mt-1">A valid email is required.</div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="mb-10">
+        <legend class="text-xl font-bold text-gray-700 mb-6 border-b pb-2 w-full">Gold Item Details</legend>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+          <div>
+            <label for="itemType" class="block text-gray-600 mb-2 font-semibold">Type of Gold Item</label>
+            <input formControlName="itemType" type="text" id="itemType" class="input-field" placeholder="e.g., Necklace, Ring, Bangle">
+            <div *ngIf="f['itemType'].invalid && (f['itemType'].dirty || f['itemType'].touched)" class="text-red-600 text-sm mt-1">Item type is required.</div>
+          </div>
+          <div>
+            <label for="numberOfItems" class="block text-gray-600 mb-2 font-semibold">Number of Items</label>
+            <input formControlName="numberOfItems" type="number" id="numberOfItems" class="input-field" placeholder="e.g., 2">
+            <div *ngIf="f['numberOfItems'].invalid && (f['numberOfItems'].dirty || f['numberOfItems'].touched)" class="text-red-600 text-sm mt-1">Please enter a valid number.</div>
+          </div>
+          <div>
+            <label for="purity" class="block text-gray-600 mb-2 font-semibold">Purity (Carat)</label>
+            <select formControlName="purity" id="purity" class="input-field">
+              <option value="" disabled>Select Purity</option>
+              <!-- <option value="8K">8K</option>
+              <option value="16K">16K</option> -->
+              <option value="14K">14K</option>
+              <option value="18K">18K</option>
+              <option value="22K">22K</option>
+              <option value="24K">24K</option>
+            </select>
+            <div *ngIf="f['purity'].invalid && (f['purity'].dirty || f['purity'].touched)" class="text-red-600 text-sm mt-1">Purity is required.</div>
+          </div>
+          <div>
+            <label for="netWeight" class="block text-gray-600 mb-2 font-semibold">Net Weight (grams)</label>
+            <input formControlName="netWeight" type="number" id="netWeight" class="input-field" placeholder="e.g., 10.5">
+            <div *ngIf="f['netWeight'].invalid && (f['netWeight'].dirty || f['netWeight'].touched)" class="text-red-600 text-sm mt-1">A valid weight is required.</div>
+          </div>
+          <div class="md:col-span-2">
+            <label for="photos" class="block text-gray-600 mb-2 font-semibold">Upload Photo(s) of Gold</label>
+            <input formControlName="photos" type="file" id="photos" multiple class="input-field file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+          </div>
+        </div>
+      </fieldset>
+
+      <div *ngIf="estimatedLoanAmount > 0" class="bg-indigo-50 border-l-4 border-indigo-500 text-indigo-800 p-4 rounded-r-lg mb-10">
+        <p class="font-bold">Maximum Estimated Loan Value: ~₹ {{ estimatedLoanAmount | number:'1.2-2' }}</p>
+      </div>
+
+      <fieldset class="mb-10">
+        <legend class="text-xl font-bold text-gray-700 mb-6 border-b pb-2 w-full">Financial & Bank Details</legend>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+          <div class="md:col-span-2">
+            <label for="amountSeeking" class="block text-gray-600 mb-2 font-semibold">Amount Seeking (₹)</label>
+            <input formControlName="amountSeeking" placeholder="e.g., 50000" type="number" id="amountSeeking" class="input-field">
+            <div *ngIf="f['amountSeeking'].invalid && (f['amountSeeking'].dirty || f['amountSeeking'].touched)" class="text-red-600 text-sm mt-1">A valid amount is required.</div>
+          </div>
+          <div>
+            <label for="bankName" class="block text-gray-600 mb-2 font-semibold">Bank Name (Registered)</label>
+            <input formControlName="bankName" type="text" id="bankName" class="input-field bg-gray-100 cursor-not-allowed" [readonly]="true">
+            <div *ngIf="f['bankName'].invalid && (f['bankName'].dirty || f['bankName'].touched)" class="text-red-600 text-sm mt-1">Bank name is required.</div>
+          </div>
+          <div>
+            <label for="accountHolderName" class="block text-gray-600 mb-2 font-semibold">Account Holder Name (Registered)</label>
+            <input formControlName="accountHolderName" type="text" class="input-field bg-gray-100 cursor-not-allowed" [readonly]="true">
+            <div *ngIf="f['accountHolderName'].invalid && (f['accountHolderName'].dirty || f['accountHolderName'].touched)" class="text-red-600 text-sm mt-1">Account holder name is required.</div>
+          </div>
+          <div>
+            <label for="accountNumber" class="block text-gray-600 mb-2 font-semibold">Bank Account Number (Registered)</label>
+            <input formControlName="accountNumber" type="text" id="accountNumber" class="input-field bg-gray-100 cursor-not-allowed" [readonly]="true">
+            <div *ngIf="f['accountNumber'].invalid && (f['accountNumber'].dirty || f['accountNumber'].touched)" class="text-red-600 text-sm mt-1">A valid account number is required.</div>
+          </div>
+          <div>
+            <label for="ifscCode" class="block text-gray-600 mb-2 font-semibold">IFSC Code (Registered)</label>
+            <input formControlName="ifscCode" type="text" id="ifscCode" maxlength="11" class="input-field bg-gray-100 cursor-not-allowed" [readonly]="true">
+            <div *ngIf="f['ifscCode'].invalid && (f['ifscCode'].dirty || f['ifscCode'].touched)" class="text-red-600 text-sm mt-1">A valid IFSC code is required.</div>
+          </div>
+          <div>
+            <label for="branchName" class="block text-gray-600 mb-2 font-semibold">Branch Name (Registered)</label>
+            <input formControlName="branchName" type="text" id="branchName" class="input-field bg-gray-100 cursor-not-allowed" [readonly]="true">
+            <div *ngIf="f['branchName'].invalid && (f['branchName'].dirty || f['branchName'].touched)" class="text-red-600 text-sm mt-1">Branch name is required.</div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="mt-8">
+         <div class="flex items-start">
+          <div class="flex items-center h-5">
+            <input formControlName="acknowledgement" id="acknowledgement" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+          </div>
+          <div class="ml-3 text-sm">
+            <label for="acknowledgement" class="font-medium text-gray-700">I acknowledge the details provided are accurate and agree to the terms.</label>
+            <div *ngIf="f['acknowledgement'].invalid && (f['acknowledgement'].dirty || f['acknowledgement'].touched)" class="text-red-600 text-sm mt-1">You must acknowledge to proceed.</div>
+          </div>
+        </div>
+      </fieldset>
+      
+      <div class="mt-10">
+        <button type="submit" [disabled]="!loanForm.valid || !kycVerified" class="submit-button">
+          Submit Loan Application
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

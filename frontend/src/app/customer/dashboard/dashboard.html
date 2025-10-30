@@ -1,0 +1,146 @@
+<div class="p-6 sm:p-8">
+  <div class="max-w-7xl mx-auto">
+    
+    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
+      <div>
+        <p class="text-gray-500">Welcome back,</p>
+        <div class="flex items-center space-x-3">
+          <h1 class="text-4xl font-bold text-gray-800">{{ userName }}</h1>
+          <span *ngIf="knNumber" class="text-sm font-semibold bg-gray-200 text-gray-700 px-3 py-1 rounded-md mt-1">
+            KN: {{ knNumber }}
+          </span>
+        </div>
+      </div>
+      <div [ngSwitch]="kycStatus" class="mt-4 sm:mt-0">
+          <div *ngSwitchCase="'verified'" class="flex items-center space-x-2 bg-green-100 text-green-800 font-semibold px-4 py-2 rounded-full">
+            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+            <span>KYC Verified</span>
+          </div>
+
+          <div *ngSwitchCase="'pending'" class="flex items-center space-x-2 bg-yellow-100 text-yellow-800 font-semibold px-4 py-2 rounded-full">
+            <svg class="w-5 h-5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1.5M12 21v-1.5M4.5 12h1.5M18 12h1.5M5.636 5.636l1.061 1.061M17.303 17.303l1.061 1.061M5.636 17.303l1.061-1.061M17.303 5.636l1.061-1.061" /></svg>
+            <span>KYC Pending Review</span>
+          </div>
+
+          <a *ngSwitchCase="'not-applied'" routerLink="/kyc" class="flex items-center space-x-2 bg-red-100 text-red-800 font-semibold px-4 py-2 rounded-full cursor-pointer hover:bg-red-200 transition">
+            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.021 3.373 1.859 3.373h13.184c1.838 0 2.724-1.873 1.859-3.376L12.182 4.436a1.25 1.25 0 0 0-2.364 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" /></svg>
+            <span>KYC Not Applied (Apply Now)</span>
+          </a>
+      </div>
+    </header>
+
+    <section class="mb-10">
+      <h2 class="text-xl font-bold text-gray-800 mb-4">Today's Gold Rate</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div *ngFor="let item of goldPrices" class="bg-white p-4 rounded-xl shadow-md text-center hover:shadow-lg transition-shadow cursor-pointer">
+          <p class="font-semibold text-gray-600">{{ item.karat }}</p>
+          <p class="text-2xl font-bold text-indigo-600">{{ item.price }}</p>
+        </div>
+      </div>
+    </section>
+
+    <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <section class="lg:col-span-2">
+        <div class="bg-white p-6 rounded-2xl shadow-md">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold text-gray-800">My Loans</h2>
+          </div>
+          <div *ngIf="loans.length > 0; else noLoans">
+            <table class="w-full text-left">
+              <thead>
+                <tr class="text-xs text-gray-500 uppercase border-b">
+                  <th class="py-3 px-4">Loan ID</th>
+                  <th class="py-3 px-4">Loan Type</th>
+                  <th class="py-3 px-4">Date</th>
+                  <th class="py-3 px-4 text-center">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let loan of loans" class="border-b last:border-none">
+                  <td class="py-4 px-4 font-semibold text-indigo-600">{{ loan.id }}</td>
+                  <td class="py-4 px-4 text-gray-700">{{ loan.type }}</td>
+                  <td class="py-4 px-4 text-gray-500">{{ loan.date }}</td>
+                  
+                  <td class="py-4 px-4 text-center">
+                    
+                      <ng-container *ngIf="loan.status.toUpperCase() === 'OFFER_MADE'; else checkVerifiedStatus"> 
+                          <button (click)="viewOffer(loan)" class="bg-indigo-600 text-white font-semibold py-1 px-3 rounded-full text-xs hover:bg-indigo-700 animate-pulse">
+                            View Offer (Step 4/5)
+                          </button>
+                      </ng-container>
+                      
+                      <ng-template #checkVerifiedStatus>
+                          <button *ngIf="loan.status.toUpperCase() === 'VERIFIED'"
+                                  [disabled]="isSubmittingGold === loan.id"
+                                  (click)="handleGoldSubmission(loan.id)" 
+                                  class="bg-indigo-600 text-white font-semibold py-1 px-3 rounded-full text-xs hover:bg-indigo-700 disabled:opacity-50 transition">
+                              {{ isSubmittingGold === loan.id ? 'Submitting...' : 'Submit Gold (Step 2)' }}
+                          </button>
+
+                          <button *ngIf="loan.status.toUpperCase() === 'REJECTED_FOR_REVIEW'"
+                                  (click)="openRejectionReview(loan)" 
+                                  class="bg-red-600 text-white font-semibold py-1 px-3 rounded-full text-xs hover:bg-red-700 transition animate-pulse">
+                              Review Rejection & Re-apply
+                          </button>
+                          
+                          <button *ngIf="loan.status.toUpperCase() === 'OFFER_REJECTED'"
+                                  (click)="openFinePayment(loan)" 
+                                  class="bg-red-600 text-white font-semibold py-1 px-3 rounded-full text-xs hover:bg-red-700 transition">
+                              Pay Fine (₹500)
+                          </button>
+                          
+                          <span *ngIf="loan.status.toUpperCase() !== 'VERIFIED' && loan.status.toUpperCase() !== 'OFFER_MADE'" 
+                                class="px-3 py-1 text-xs font-semibold rounded-full" 
+                                [ngClass]="{
+                                  'bg-green-100 text-green-800': loan.status.toUpperCase() === 'OFFER_ACCEPTED' || loan.status.toUpperCase() === 'DISBURSED' || loan.status.toUpperCase() === 'ACCEPTED',
+                                  'bg-yellow-100 text-yellow-800': loan.status.toUpperCase() === 'PENDING' || loan.status.toUpperCase() === 'EVALUATED' || loan.status.toUpperCase() === 'GOLD_SUBMITTED',
+                                  'bg-red-100 text-red-800': loan.status.toUpperCase() === 'OFFER_REJECTED' || loan.status.toUpperCase() === 'REJECTED' || loan.status.toUpperCase() === 'REJECTED_FOR_REVIEW'
+                                }">
+                              {{ loan.status }}
+                          </span>
+                      </ng-template>
+
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <ng-template #noLoans>
+            <p class="text-center text-gray-500 py-8">You have no active loan applications.</p>
+          </ng-template>
+        </div>
+      </section>
+
+      <aside class="lg:col-span-1">
+        <div class="bg-white p-6 rounded-2xl shadow-md">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">Quick Loan Calculator</h3>
+          <form [formGroup]="calculatorForm" (ngSubmit)="onCalculate()" class="space-y-4">
+            <div>
+              <label for="weight" class="block text-sm font-medium text-gray-700">Weight (grams)</label>
+              <input type="number" formControlName="weight" id="weight" class="input-field mt-1" placeholder="e.g., 10.5">
+            </div>
+            <div>
+              <label for="purity" class="block text-sm font-medium text-gray-700">Purity (Carat)</label>
+              <select formControlName="purity" id="purity" class="input-field mt-1">
+                <option value="" disabled>Select Purity</option>
+                <option value="14K">14K</option>
+                <option value="18K">18K</option>
+                <option value="22K">22K</option>
+                <option value="24K">24K</option>
+              </select>
+            </div>
+            <div>
+              <button type="submit" [disabled]="!calculatorForm.valid" class="w-full bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 disabled:bg-gray-400">
+                Calculate
+              </button>
+            </div>
+          </form>
+          <div *ngIf="estimatedValue > 0" class="mt-4 p-4 bg-indigo-50 rounded-lg text-center">
+            <p class="text-sm text-indigo-700">Maximum Estimated Loan Value:</p>
+            <p class="text-2xl font-bold text-indigo-600">~₹ {{ estimatedValue | number:'1.0-0' }}</p>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+</div>

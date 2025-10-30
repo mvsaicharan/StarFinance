@@ -1,0 +1,139 @@
+<div class="p-6 sm:p-8 bg-gradient-to-r from-indigo-200 via-blue-200 to-yellow-200">
+  
+  <a routerLink="/employee/dashboard" class="inline-flex items-center gap-2 text-indigo-600 font-semibold hover:underline mb-6">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M17 10a.75.75 0 0 1-.75.75H5.612l4.158 3.96a.75.75 0 1 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.08l5.5-5.25a.75.75 0 1 1 1.04 1.08L5.612 9.25H16.25A.75.75 0 0 1 17 10Z" clip-rule="evenodd" /></svg>
+    Back to Dashboard
+  </a>
+
+  <div *ngIf="errorMessage" class="mb-6 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-lg">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="loadingInitialData" class="text-center py-20 text-gray-500">
+      <div class="flex flex-col items-center">
+          <svg class="animate-spin h-8 w-8 text-indigo-500 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+          Loading loan details...
+      </div>
+  </div>
+
+  <section *ngIf="!loadingInitialData && loanDetails as loan">
+    <h3 class="text-3xl font-bold text-gray-800">Loan Processing</h3>
+    <p class="text-gray-500 mt-1">
+      Request ID: <span class="text-indigo-700 font-semibold">{{ loan.rid }}</span>
+    </p>
+
+    <div class="grid md:grid-cols-3 gap-6 mt-6">
+      
+      <div class="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+        <h4 class="text-indigo-700 font-semibold mb-2">Current Status (Step)</h4>
+        <p class="font-bold text-xl" [ngClass]="{
+          'text-green-600': loan.status.toUpperCase() === 'OFFER_ACCEPTED' || loan.status.toUpperCase() === 'DISBURSED' || loan.status.toUpperCase() === 'ACCEPTED',
+          'text-yellow-600': loan.status.toUpperCase() === 'PENDING' || loan.status.toUpperCase() === 'VERIFIED' || loan.status.toUpperCase() === 'EVALUATED' || loan.status.toUpperCase() === 'OFFER_MADE' || loan.status.toUpperCase() === 'GOLD_SUBMITTED',
+          'text-red-600': loan.status.toUpperCase() === 'REJECTED' || loan.status.toUpperCase() === 'REJECTED_FOR_REVIEW' || loan.status.toUpperCase() === 'OFFER_REJECTED'
+        }">{{ loan.status }}</p>
+        <p class="text-gray-500 text-sm">Requested: {{ loan.date }}</p>
+      </div>
+
+      <div class="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+        <h4 class="text-indigo-700 font-semibold mb-2">Loan Amount</h4>
+        <p class="text-gray-700">Requested: <strong class="text-gray-900">₹{{ loan.amount | number:'1.2-2' }}</strong></p>
+        <p *ngIf="loan.finalValue" class="text-gray-700">Final Offer: <strong class="text-green-600">₹{{ loan.finalValue | number:'1.2-2' }}</strong></p>
+      </div>
+
+      <div class="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+        <h4 class="text-indigo-700 font-semibold mb-3">Workflow Actions</h4>
+        <div class="flex flex-wrap gap-3">
+          
+          <ng-container *ngIf="loan.status.toUpperCase() === 'PENDING' || loan.status.toUpperCase() === 'REJECTED_FOR_REVIEW'">
+            <button (click)="verifyDetails(true)" class="px-4 py-2 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition">Verify Details (Step 1)</button>
+            <button (click)="verifyDetails(false)" class="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition">Reject for Review</button>
+          </ng-container>
+          
+          <ng-container *ngIf="loan.status.toUpperCase() === 'VERIFIED'">
+            <button class="px-4 py-2 rounded-lg bg-gray-200 text-gray-800 font-semibold transition" disabled>Waiting for Gold Deposit (Step 2)</button>
+          </ng-container>
+            
+          <ng-container *ngIf="loan.status.toUpperCase() === 'GOLD_SUBMITTED'">
+            <button (click)="handleGoldReceipt(true)" class="px-4 py-2 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition">
+              Accept for Evaluation (Step 3)
+            </button>
+            <button (click)="handleGoldReceipt(false)" class="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition">
+              Reject Gold & End
+            </button>
+          </ng-container>
+
+          <ng-container *ngIf="loan.status.toUpperCase() === 'EVALUATED'">
+            <button (click)="approveLoan()" class="px-4 py-2 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition">Send Offer (Step 4)</button>
+            <button (click)="rejectLoan()" class="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition">Final Reject</button>
+          </ng-container>
+
+          <ng-container *ngIf="loan.status.toUpperCase() === 'OFFER_ACCEPTED'">
+            <button (click)="disburseLoan()" class="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition">Disburse Loan (Step 6)</button>
+          </ng-container>
+          
+          <ng-container *ngIf="loan.status.toUpperCase() === 'DISBURSED'">
+            <button class="px-4 py-2 rounded-lg bg-green-200 text-green-800 font-semibold transition" disabled>Loan Disbursed</button>
+          </ng-container>
+          
+          <ng-container *ngIf="loan.status.toUpperCase() === 'REJECTED'">
+            <button class="px-4 py-2 rounded-lg bg-red-200 text-red-800 font-semibold transition" disabled>Permanently Rejected</button>
+          </ng-container>
+
+          <ng-container *ngIf="loan.status.toUpperCase() === 'OFFER_REJECTED'">
+            <button class="px-4 py-2 rounded-lg bg-gray-200 text-gray-800 font-semibold transition" disabled>Awaiting Fine Payment</button>
+          </ng-container>
+          
+          <ng-container *ngIf="loan.status.toUpperCase() === 'PAID_FINE'">
+              <button (click)="handleCollectGold(loan.rid)" class="px-4 py-2 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition">
+                  Collect Gold (Finalize)
+              </button>
+          </ng-container>
+
+          <ng-container *ngIf="loan.status.toUpperCase() === 'GOLD_COLLECTED'">
+              <button class="px-4 py-2 rounded-lg bg-red-200 text-red-800 font-semibold transition" disabled>Loan Not Approved</button>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+    
+    <div class="grid md:grid-cols-3 gap-6 mt-6">
+      
+      <div class="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+        <h4 class="text-indigo-700 font-semibold mb-3">Customer Information</h4>
+        <div class="space-y-2 text-gray-700">
+          <p>Name: <strong class="text-gray-900">{{ loan.applicant.fullName }}</strong></p>
+          <p>KN Number: <strong class="text-gray-900">{{ loan.applicant.knNumber }}</strong></p>
+          <p>Mobile: <strong class="text-gray-900">{{ loan.applicant.mobileNumber }}</strong></p>
+          <p>Email: <strong class="text-gray-900">{{ loan.applicant.emailId }}</strong></p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+        <h4 class="text-indigo-700 font-semibold mb-3">Asset Details</h4>
+        <div class="space-y-2 text-gray-700">
+          <p>Item Type: <strong class="text-gray-900">{{ loan.asset.itemType }}</strong></p>
+          <p>Number of Items: <strong class="text-gray-900">{{ loan.asset.numberOfItems }}</strong></p>
+          <p>Purity: <strong class="text-gray-900">{{ loan.asset.purity }}</strong></p>
+          <p>Net Weight: <strong class="text-gray-900">{{ loan.asset.netWeight }}</strong></p>
+          <p *ngIf="loan.asset.qualityIndex">Quality Index: <strong class="text-gray-900">{{ loan.asset.qualityIndex }}%</strong></p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+        <h4 class="text-indigo-700 font-semibold mb-3">Bank Details</h4>
+        <div class="space-y-2 text-gray-700">
+          <p>Bank: <strong class="text-gray-900">{{ loan.financial.bankName }}</strong></p>
+          <p>Account Holder: <strong class="text-gray-900">{{ loan.financial.accountHolderName }}</strong></p>
+          <p>Account No.: <strong class="text-gray-900">{{ loan.financial.accountNumber }}</strong></p>
+          <p>IFSC: <strong class="text-gray-900">{{ loan.financial.ifscCode }}</strong></p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+  
+  <div *ngIf="!loadingInitialData && !errorMessage && !loanDetails" class="text-center py-20 text-gray-500">
+      Loan details not available or missing ID.
+  </div>
+
+</div>

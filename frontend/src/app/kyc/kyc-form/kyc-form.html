@@ -1,0 +1,171 @@
+<div class="py-12 px-6">
+  <div class="max-w-3xl mx-auto bg-white p-8 sm:p-10 rounded-2xl shadow-lg border border-gray-100">
+    
+    <div class="text-center mb-8">
+      <div class="inline-block bg-indigo-100 p-4 rounded-full mb-4">
+        <svg class="w-10 h-10 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" /></svg>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-800">
+        <span *ngIf="!isKycVerified">KYC Verification</span>
+        <span *ngIf="isKycVerified">KYC Profile - {{ customerProfile?.name }}</span>
+      </h1>
+      <p class="text-gray-500 mt-2">
+        <span *ngIf="!isKycVerified">Please provide your details for verification.</span>
+        <span *ngIf="isKycVerified">Your profile details are verified. Sensitive fields are locked.</span>
+      </p>
+      
+      <p *ngIf="isKycVerified && customerProfile?.knNumber" class="mt-4 text-lg font-semibold text-green-600">
+        KYC Verified! KN Number: {{ customerProfile?.knNumber }}
+      </p>
+    </div>
+
+    <div *ngIf="errorMessage" class="mb-6 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-lg">
+      {{ errorMessage }}
+    </div>
+    <div *ngIf="successMessage" class="mb-6 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded-lg">
+      <div *ngIf="submitting" class="flex items-center">
+        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span>{{ successMessage }}</span>
+      </div>
+      <span *ngIf="!submitting">{{ successMessage }}</span>
+    </div>
+    <form [formGroup]="kycForm" (ngSubmit)="onSubmit()">
+      
+      <fieldset class="mb-10">
+        <legend class="text-xl font-bold text-gray-700 mb-6 border-b pb-2 w-full">1. Personal Information</legend>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="md:col-span-2">
+            <label for="fullName" class="block text-gray-600 mb-2 font-semibold">Full Name</label>
+            <input formControlName="fullName" placeholder="As per your ID proof" type="text" id="fullName" class="input-field">
+          </div>
+          <div>
+            <label for="dateOfBirth" class="block text-gray-600 mb-2 font-semibold">Date of Birth</label>
+            <input formControlName="dateOfBirth" type="date" id="dateOfBirth" class="input-field">
+          </div>
+          <div>
+            <label for="gender" class="block text-gray-600 mb-2 font-semibold">Gender</label>
+            <select formControlName="gender" id="gender" class="input-field">
+              <option value="" disabled>Select Gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label for="mobileNumber" class="block text-gray-600 mb-2 font-semibold">Mobile Number</label>
+            <input formControlName="mobileNumber" placeholder="10-digit mobile number" type="text" id="mobileNumber" maxlength="10" class="input-field">
+          </div>
+          <div>
+            <label for="email" class="block text-gray-600 mb-2 font-semibold">Email Address</label>
+            <input formControlName="email" placeholder="you@example.com" type="email" id="email" class="input-field">
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="mb-10">
+        <legend class="text-xl font-bold text-gray-700 mb-6 border-b pb-2 w-full">2. Identity Proof</legend>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="aadhaarNumber" class="block text-gray-600 mb-2 font-semibold">Aadhaar Number</label>
+              <input formControlName="aadhaarNumber" placeholder="12-digit number" type="text" id="aadhaarNumber" maxlength="12" class="input-field">
+            </div>
+            <div>
+              <label for="panNumber" class="block text-gray-600 mb-2 font-semibold">PAN Card Number</label>
+              <input formControlName="panNumber" placeholder="e.g., ABCDE1234F" type="text" id="panNumber" maxlength="10" class="input-field">
+            </div>
+            <div class="md:col-span-2">
+              <label for="passportNumber" class="block text-gray-600 mb-2 font-semibold">Passport Number (Optional)</label>
+              <input formControlName="passportNumber" placeholder="Type NA if not applicable" type="text" id="passportNumber" maxlength="8" class="input-field">
+            </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="mb-10">
+        <legend class="text-xl font-bold text-gray-700 mb-6 border-b pb-2 w-full">3. Address Details</legend>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="md:col-span-2">
+              <label for="address" class="block text-gray-600 mb-2 font-semibold">Full Address</label>
+              <textarea formControlName="address" placeholder="House No, Street, Landmark" id="address" rows="3" class="input-field"></textarea>
+            </div>
+            <div>
+              <label for="city" class="block text-gray-600 mb-2 font-semibold">City</label>
+              <input formControlName="city" type="text" id="city" class="input-field">
+            </div>
+            <div>
+              <label for="state" class="block text-gray-600 mb-2 font-semibold">State</label>
+              <input formControlName="state" type="text" id="state" class="input-field">
+            </div>
+            <div>
+              <label for="pinCode" class="block text-gray-600 mb-2 font-semibold">PIN Code</label>
+              <input formControlName="pinCode" placeholder="6-digit PIN code" type="text" id="pinCode" maxlength="6" class="input-field">
+            </div>
+        </div>
+      </fieldset>
+
+       <fieldset class="mb-10">
+        <legend class="text-xl font-bold text-gray-700 mb-6 border-b pb-2 w-full">4. Financial Details</legend>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="occupation" class="block text-gray-600 mb-2 font-semibold">Occupation</label>
+              <input formControlName="occupation" placeholder="e.g., Govt employee, Teacher" type="text" id="occupation" class="input-field">
+            </div>
+            <div>
+              <label for="income" class="block text-gray-600 mb-2 font-semibold">Annual Income</label>
+              <select formControlName="income" id="income" class="input-field">
+                <option value="" disabled>Select Income Range</option>
+                <option value="<3L">Less than 3 Lakhs</option>
+                <option value="3L-5L">3 to 5 Lakhs</option>
+                <option value="5L-10L">5 to 10 Lakhs</option>
+                <option value=">10L">More than 10 Lakhs</option>
+              </select>
+            </div>
+            <div>
+              <label for="bankAccountNumber" class="block text-gray-600 mb-2 font-semibold">Bank Account Number</label>
+              <input formControlName="bankAccountNumber" placeholder="Enter bank account number" type="text" id="bankAccountNumber" class="input-field">
+            </div>
+            <div>
+              <label for="ifscCode" class="block text-gray-600 mb-2 font-semibold">IFSC Code</label>
+              <input formControlName="ifscCode" placeholder="e.g., SBIN0001234" type="text" id="ifscCode" maxlength="11" class="input-field">
+            </div>
+            <div class="md:col-span-2">
+              <label for="existingLoans" class="block text-gray-600 mb-2 font-semibold">Existing Loans</label>
+              <input formControlName="existingLoans" placeholder="Type 'No' if there are none" type="text" id="existingLoans" class="input-field">
+            </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="mt-8">
+         <div class="flex items-start">
+          <div class="flex items-center h-5">
+            <input formControlName="declaration" id="declaration" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+          </div>
+          <div class="ml-3 text-sm">
+            <label for="declaration" class="font-medium text-gray-700">I hereby declare that the information provided is true and I consent to verification.</label>
+          </div>
+        </div>
+      </fieldset>
+      
+      <div class="mt-10 flex flex-col sm:flex-row justify-between items-center">
+        <button *ngIf="!isKycVerified" type="submit" [disabled]="kycForm.invalid || submitting" class="submit-button mb-4 sm:mb-0 w-full sm:w-auto" [class.opacity-50]="kycForm.invalid || submitting">
+          <span *ngIf="!submitting">Submit for Verification</span>
+          <span *ngIf="submitting">Verifying...</span>
+        </button>
+
+        <div *ngIf="isKycVerified" class="w-full sm:w-auto flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+            <button type="submit" [disabled]="submitting" class="submit-button bg-green-500 hover:bg-green-600 w-full sm:w-auto" [class.opacity-50]="submitting">
+                <span *ngIf="!submitting">Submit Update</span>
+                <span *ngIf="submitting">Updating Profile...</span>
+            </button>
+            
+            <!-- <a routerLink="/request-kyc-edit" class="inline-block text-center bg-gray-200 text-gray-800 font-bold py-3 px-6 rounded-lg hover:bg-gray-300 transition duration-150 w-full sm:w-auto">
+              Request Core Edit
+            </a> -->
+        </div>
+      </div>
+
+    </form>
+    </div>
+</div>
